@@ -1,0 +1,46 @@
+clc
+clear
+load nahid_ECG-L05.mat
+whos
+
+% Sample ECG signal (replace this with your actual ECG signal)
+voltage=data(:,1);
+hr=data(:,2);
+fs=1000;
+
+% Filtering (optional, depending on your signal)
+t=(0:length(voltage)-1/fs);
+
+threshold=0.5;
+above_threshold=voltage>threshold;
+zero_crossing=diff(above_threshold);
+
+
+
+% Calculate heart rate
+r_peak_indices=find(zero_crossing==1);
+rr_intervals=diff(r_peak_indices)/fs;
+heart_rate = 60/ mean(rr_intervals);
+
+disp(['Heart Rate: ' num2str(heart_rate) ' beats per minute']);
+
+% Plot the ECG signal with detected R-peaks
+figure;
+subplot(2,1,1)
+plot(t, voltage);
+hold on;
+plot(t(r_peak_indices), voltage(r_peak_indices), 'ro', 'MarkerSize', 5);
+title('ECG Signal with Detected R-peaks');
+xlabel('Time (s)');
+ylabel('ECG Voltage');
+legend('ECG Signal', 'R-peaks');
+
+subplot(2,1,2)
+plot(t, hr);
+hold on;
+plot(hr(r_peak_indices), voltage(r_peak_indices));
+title('ECG Signal with Detected R-peaks');
+xlabel('Time (s)');
+ylabel('Heart Rate');
+legend('ECG Signal', 'R-peaks');
+hold off;
